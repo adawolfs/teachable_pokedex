@@ -1,0 +1,3 @@
+0 Charmander
+1 Bulbasaur
+2 Squirtle
