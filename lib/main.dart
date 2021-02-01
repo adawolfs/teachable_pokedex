@@ -2,6 +2,8 @@ import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
 import 'package:teachable_pokedex/HomeScreen.dart';
 
+import 'package:teachable_pokedex/ui/flutter_dex.dart';
+
 List<CameraDescription> cameras;
 
 Future<Null> main() async {
@@ -19,7 +21,8 @@ class MainScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: HomeScreen(cameras),
+      // home: HomeScreen(cameras),
+      home: FlareFlutterDex(cameras),
     );
   }
 }

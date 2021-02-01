@@ -3,9 +3,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 
 class Labels extends StatelessWidget {
   final List<dynamic> _recognitions;
-  final bool _recognitionChange;
 
-  Labels(this._recognitions, this._recognitionChange);
+  Labels(this._recognitions);
 
   @override
   Widget build(BuildContext context) {

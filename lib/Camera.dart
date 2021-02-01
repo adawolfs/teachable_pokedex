@@ -3,7 +3,7 @@ import 'package:camera/camera.dart';
 import 'package:tflite/tflite.dart';
 import 'dart:math' as math;
 
-typedef void Callback(List<dynamic> list, int h, int w);
+typedef void Callback(List<dynamic> list);
 
 class Camera extends StatefulWidget {
   final List<CameraDescription> cameras;
@@ -56,8 +56,7 @@ class _CameraState extends State<Camera> {
               int endTime = new DateTime.now().millisecondsSinceEpoch;
               print("Detection took ${endTime - startTime}");
 
-              widget.setRecognitions(recognitions, img.height, img.width);
-
+              widget.setRecognitions(recognitions);
               isDetecting = false;
             });
           }
@@ -86,13 +85,14 @@ class _CameraState extends State<Camera> {
     var previewW = math.min(tmp.height, tmp.width);
     var screenRatio = screenH / screenW;
     var previewRatio = previewH / previewW;
-
+/*
     return OverflowBox(
       maxHeight:
           screenRatio > previewRatio ? screenH : screenW / previewW * previewH,
       maxWidth:
           screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
       child: CameraPreview(controller),
-    );
+    );*/
+    return CameraPreview(controller);
   }
 }

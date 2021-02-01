@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:teachable_pokedex/Label.dart';
 import 'package:teachable_pokedex/Camera.dart';
+import 'package:teachable_pokedex/PokeEntry.dart';
 import 'package:tflite/tflite.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -15,22 +16,19 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  CameraController controller;
   List<dynamic> _recognitions;
-  bool _recognitionChange = false;
+  bool _stopCamera = false;
   int _imageHeight = 0;
   int _imageWidth = 0;
   bool _model_loaded = false;
+  Camera camera;
 
   @override
   void initState() {
     super.initState();
-    loadModel();
-  }
 
-  loadVoice() async {
-    FlutterTts flutterTts = FlutterTts();
-    await flutterTts.awaitSpeakCompletion(true);
-    await flutterTts.speak("Charmander");
+    loadModel();
   }
 
   loadModel() async {
@@ -43,38 +41,62 @@ class _HomeScreenState extends State<HomeScreen> {
     });
   }
 
+  startStream() {
+    setState(() {
+      _stopCamera = false;
+    });
+  }
+
   onSelectModel() {
     loadModel();
   }
 
-  setRecognitions(recognitions, imageHeight, imageWidth) {
+  setRecognitions(recognitions) {
     print(recognitions);
+    /*controller.stopImageStream();*/
     setState(() {
-      _imageHeight = imageHeight;
-      _imageWidth = imageWidth;
       _recognitions = recognitions;
-      if (_recognitions[0] == recognitions[0]) {
-        _recognitionChange = false;
-      } else {
-        _recognitionChange = true;
-      }
+      _stopCamera = true;
     });
+    /*if (_stopCamera) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => PokeEntry(recognitions[0])),
+      ).then((value) {
+        camera.startImageStream();
+        setState(() {
+          _stopCamera = false;
+        });
+      });
+    }*/
   }
 
   Widget _createLabels() {
-    return Labels(
-        _recognitions == null ? [] : _recognitions, _recognitionChange);
+    return Labels(_recognitions == null ? [] : _recognitions);
   }
 
   @override
   Widget build(BuildContext context) {
     Size screen = MediaQuery.of(context).size;
+    controller = new CameraController(
+      widget.cameras[0],
+      ResolutionPreset.high,
+    );
+    camera = Camera(widget.cameras, setRecognitions);
     return Scaffold(
       body: !_model_loaded
           ? Container()
           : Stack(
               children: [
-                Camera(widget.cameras, setRecognitions),
+                GestureDetector(
+                  child: camera,
+                  onTap: () {
+                    print("tap");
+                    setState(() {
+                      _stopCamera = false;
+                    });
+                  },
+                ),
                 _createLabels(),
               ],
             ),
