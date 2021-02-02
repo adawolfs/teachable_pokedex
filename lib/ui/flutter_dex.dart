@@ -96,7 +96,7 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     // Says pokemon name
     speak(_pokemonDetected).then((_) {
       camera.controller.stopImageStream();
-      camera.controller.dispose();
+      //camera.controller.dispose();
     });
   }
 
@@ -119,7 +119,7 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     return Container(
       padding: EdgeInsets.all(20),
       child: Text(
-        _pokemonDetected,
+        _pokemonDetected != null ? _pokemonDetected : "",
         style: TextStyle(fontSize: 20),
       ),
     );
