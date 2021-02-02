@@ -27,11 +27,14 @@ dependencies:
   flutter_tts: ^2.1.0
   image: ^2.1.19
   image_picker: ^0.6.7+22
-  #flare_flutter: ^1.5.8
-  smart_flare: ^0.2.9+1
+  flare_flutter: ^2.0.1
+  # TODO: Replace by builded vertion
+  smart_flare:
+    path: /home/adawolfs/projects/flutter-projects/smart_flare
   tflite: ^1.1.1
   tflite_flutter: ^0.5.0
   tflite_flutter_helper: ^0.1.2
+  vibration: ^1.7.3
 
 dev_dependencies:
   flutter_test:
