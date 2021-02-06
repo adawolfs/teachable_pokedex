@@ -4,38 +4,38 @@ import 'package:camera/camera.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:smart_flare/actors/smart_flare_actor.dart';
 import 'package:smart_flare/smart_flare.dart';
-import 'package:teachable_pokedex/Camera.dart';
+import 'package:teachable_pokedex/Camerav2.dart';
+import 'package:teachable_pokedex/ui/data_screen.dart';
+import 'package:teachable_pokedex/ui/sounds.dart';
 import 'package:tflite/tflite.dart';
-import 'dart:math';
-
 import 'package:vibration/vibration.dart';
+
+// NOTE Screen States
+const String POKEDEX = "pokedex";
+const String CAMERA = "camera";
+const String DATA = "data";
+const String IDLE = "idle";
+
+// NOTE Animations
+const String ANIMATION_IDLE = "idle";
+const String ANIMATION_LIGHTS = "blue_light";
+
+// NOTE Rive File with UI
+const String FLUTTER_DEX_FILE = "assets/FlutterDex.flr";
+// NOTE TensorFlowLite Model
+const String TFLITE_MODEL = "assets/pokedex.tflite";
+const String TFLITE_LABELS = "assets/pokedex.txt";
+
+// NOTE Debug vas
+const bool ENABLE_SMARTFLARE_DEBUG = false;
 
 class FlareFlutterDex extends StatefulWidget {
   final List<CameraDescription> cameras;
   FlareFlutterDex(this.cameras);
 
-  final List<Widget> scenes = [
-    Image.asset("assets/pikachu_sparks.gif"),
-    Image.asset("assets/run_forest_run.gif"),
-  ];
-
-  void randomScene() {
-    var random = Random();
-    var index = random.nextInt(scenes.length);
-  }
-
   @override
   _FlareFlutterDexState createState() => _FlareFlutterDexState();
 }
-
-const String POKEDEX = "pokedex";
-const String CAMERA = "camera";
-const String DATA = "data";
-const String IDLE = "idle";
-const String FLUTTER_DEX_FILE = "assets/FlutterDex.flr";
-
-const String ANIMATION_IDLE = "idle";
-const String ANIMATION_LIGHTS = "blue_light";
 
 class _FlareFlutterDexState extends State<FlareFlutterDex> {
   // SECTION: APPLICATON SETUP
@@ -43,26 +43,33 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
   List<dynamic> _recognitions;
   bool _modelLoaded;
   bool _speaking;
-  String _pokemonDetected;
+  bool _iteracting;
+  dynamic _pokemonDetected;
   String _display;
   String _upperBarAnimation;
 
   // NOTE: Camera instance
   Camera camera;
+  CameraController controller;
   FlutterTts flutterTts = FlutterTts();
 
   // NOTE: Init State
   @override
   void initState() {
     super.initState();
+    _initializeVars();
+    loadModel();
+    loadSounds();
+    loadVoice();
+  }
+
+  void _initializeVars() {
     _modelLoaded = false;
     _speaking = false;
+    _iteracting = false;
     _pokemonDetected = "";
     _display = IDLE;
     _upperBarAnimation = ANIMATION_IDLE;
-
-    loadModel();
-    loadVoice();
   }
 
   loadVoice() async {
@@ -72,71 +79,78 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
   loadModel() async {
     String result;
     result = await Tflite.loadModel(
-        labels: "assets/pokedex.txt", model: "assets/pokedex.tflite");
+      labels: TFLITE_LABELS,
+      model: TFLITE_MODEL,
+    );
     print(result);
     setState(() {
       _modelLoaded = true;
     });
   }
 
-  void changeScene() {
-    setState(() {
-      widget.randomScene();
-    });
-  }
+  // SECTION Callback para manejar las predicciónes
+  void setRecognitions(recognitions) {
+    if (_iteracting == true) return;
+    _iteracting = true;
 
-  setRecognitions(recognitions) {
     setState(() {
       _recognitions = recognitions;
       _display = DATA;
-      _upperBarAnimation = ANIMATION_IDLE;
-      _pokemonDetected = _recognitions[0]["label"];
-    });
-
-    // Says pokemon name
-    speak(_pokemonDetected).then((_) {
-      camera.controller.stopImageStream();
-      //camera.controller.dispose();
+      if (_recognitions == null) {
+        _pokemonDetected = "pokemon not detected";
+      } else {
+        _pokemonDetected = _recognitions[0];
+      }
     });
   }
+  // !SECTION Callback para manejar las predicciónes
 
   // NOTE Manages the speak actions
   Future<dynamic> speak(say) async {
     if (!_speaking) {
       _speaking = true;
-      flutterTts.speak(say).then((_) {
+      return flutterTts.speak(say).then((_) {
         _speaking = false;
       });
     }
   }
 
+  // NOTE Pantalla en "blanco"
   Widget _idleScreen() {
     return Container();
   }
 
+  void _endDataInteraction() {
+    setState(() {
+      _iteracting = false;
+      _upperBarAnimation = ANIMATION_IDLE;
+    });
+  }
+
   // NOTE Data Backed?
   Widget _data() {
-    return Container(
-      padding: EdgeInsets.all(20),
-      child: Text(
-        _pokemonDetected != null ? _pokemonDetected : "",
-        style: TextStyle(fontSize: 20),
-      ),
-    );
+    // Pokemon at index
+    int pokemonIndex = _pokemonDetected['index'];
+    return DataScreen(pokemonIndex, speak, _endDataInteraction);
   }
 
   // NOTE Load Display Content
-  Widget _loadDisplay() {
+  Widget _loadDisplay(double size) {
     Widget newDisplay;
     switch (_display) {
       case IDLE:
         newDisplay = _idleScreen();
         break;
       case DATA:
+        print("data");
+        playSound(RECOGNITION);
         newDisplay = _data();
         break;
       case CAMERA:
-        camera = Camera(widget.cameras, setRecognitions);
+        playSound(OPEN_CAMERA);
+        if (camera == null) {
+          camera = Camera(setRecognitions, size);
+        }
         return camera;
         break;
       default:
@@ -144,8 +158,8 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     }
     return newDisplay;
   }
-
   // !SECTION
+
   // SECTION APPLICATION UI DEFINITION
   @override
   Widget build(BuildContext context) {
@@ -207,16 +221,17 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     );
   }
 
+  // NOTE Widget que dibuja el marco de la pantalla y su contenido
   Widget _displayFrame() {
     return Stack(
       children: <Widget>[
         Container(
-          color: Colors.white,
+          color: Colors.black,
           margin: EdgeInsets.all(30),
           //padding: EdgeInsets.fromLTRB(20, 0, 20, 0),
           width: 280,
           height: 200,
-          child: _loadDisplay(),
+          child: _loadDisplay(280),
         ),
         Container(
           width: 330,
@@ -242,7 +257,7 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
         activeAreas: [
           ActiveArea(
             area: Rect.fromLTWH(0, 0, 100, 100),
-            debugArea: false,
+            debugArea: ENABLE_SMARTFLARE_DEBUG,
             onAreaTapped: () {
               print("red button");
               Vibration.vibrate(duration: 40);
@@ -268,12 +283,12 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
         activeAreas: [
           ActiveArea(
             area: Rect.fromLTWH(0, 0, 100, 100),
-            debugArea: false,
+            debugArea: ENABLE_SMARTFLARE_DEBUG,
             onAreaTapped: () {
               print("green button");
               Vibration.vibrate(duration: 40);
               setState(() {
-                _display = IDLE;
+                _initializeVars();
               });
             },
           ),
@@ -295,22 +310,22 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
           // UP
           RelativeActiveArea(
               area: Rect.fromLTWH(0.35, 0, 0.20, 0.4),
-              debugArea: true,
+              debugArea: ENABLE_SMARTFLARE_DEBUG,
               onAreaTapped: () => {print("up")}),
           // RIGHT
           RelativeActiveArea(
               area: Rect.fromLTWH(0.55, 0.35, 0.35, 0.2),
-              debugArea: true,
+              debugArea: ENABLE_SMARTFLARE_DEBUG,
               onAreaTapped: () => {print("right")}),
           // LEFT
           RelativeActiveArea(
               area: Rect.fromLTWH(0, 0.35, 0.35, 0.2),
-              debugArea: true,
+              debugArea: ENABLE_SMARTFLARE_DEBUG,
               onAreaTapped: () => {print("left")}),
           // Down
           RelativeActiveArea(
               area: Rect.fromLTWH(0.35, 0.5, 0.20, 0.4),
-              debugArea: true,
+              debugArea: ENABLE_SMARTFLARE_DEBUG,
               onAreaTapped: () => {print("down")}),
         ],
       ),
@@ -331,12 +346,12 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
         activeAreas: [
           ActiveArea(
             area: Rect.fromLTWH(0, 0, 100, 100),
-            debugArea: false,
+            debugArea: ENABLE_SMARTFLARE_DEBUG,
             animationName: 'push',
             onAreaTapped: () {
               print("blue button CAMERA");
               Vibration.vibrate(duration: 40);
-              if (_display != CAMERA) {
+              if (_display != CAMERA && !_iteracting) {
                 setState(() {
                   _display = CAMERA;
                   _upperBarAnimation = ANIMATION_LIGHTS;

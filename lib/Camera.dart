@@ -3,101 +3,144 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:camera/camera.dart';
 import 'package:tflite/tflite.dart';
-import 'dart:math' as math;
 
 typedef void Callback(List<dynamic> list);
 
 class Camera extends StatefulWidget {
-  final List<CameraDescription> cameras;
   final Callback setRecognitions;
-  CameraController controller;
-  Camera(this.cameras, this.setRecognitions);
+  final double size;
+  Camera(this.setRecognitions, this.size, {Key key}) : super(key: key);
 
   @override
-  _CameraState createState() => new _CameraState();
+  _CameraState createState() => _CameraState();
 }
 
 class _CameraState extends State<Camera> {
+  CameraController cameraController;
+  Future<void> _initializeControllerFuture;
   bool isDetecting = false;
+  List cameras;
+  int selectedCameraIndex;
 
   @override
   void initState() {
     super.initState();
-
-    if (widget.cameras == null || widget.cameras.length < 1) {
-      print('No camera is found');
-    } else {
-      widget.controller = new CameraController(
-        widget.cameras[0],
-        ResolutionPreset.high,
-      );
-      widget.controller.initialize().then((_) {
-        if (!mounted) {
-          return;
-        }
-        setState(() {});
-
-        widget.controller.startImageStream((CameraImage img) {
-          // SECTION Detection
-          if (!isDetecting) {
-            isDetecting = true;
-            Timer(Duration(seconds: 2), () {
-              int startTime = new DateTime.now().millisecondsSinceEpoch;
-
-              // NOTE Ejecutar modelo y obtener predicción
-              Tflite.runModelOnFrame(
-                bytesList: img.planes.map((plane) {
-                  return plane.bytes;
-                }).toList(),
-                imageHeight: img.height,
-                imageWidth: img.width,
-                imageMean: 127.5,
-                imageStd: 127.5,
-                numResults: 2,
-                threshold: 0.4,
-              ).then((recognitions) {
-                int endTime = new DateTime.now().millisecondsSinceEpoch;
-                print("Detection took ${endTime - startTime}");
-                // NOTE Ejecutal "Callback"
-                widget.setRecognitions(recognitions);
-                isDetecting = false;
-              });
-            });
-          }
-          // !SECTION Detection
-        });
-      });
-    }
+    _initCameras();
   }
 
-  @override
-  void dispose() {
-    widget.controller?.dispose();
-    super.dispose();
+  void _initCameras() {
+    availableCameras().then((value) {
+      cameras = value;
+      if (cameras.length > 0) {
+        setState(() {
+          selectedCameraIndex = 0;
+        });
+        initCamera(cameras[selectedCameraIndex]).then((value) {});
+      } else {
+        print('No camera available');
+      }
+    }).catchError((e) {
+      print('Error : ${e.code}');
+    });
+  }
+
+  // SECTION InitCamera
+  Future initCamera(CameraDescription cameraDescription) async {
+    // Si ya existe un controlador entonces soltar los recursos de la camara
+    if (cameraController != null) {
+      await cameraController.dispose();
+    }
+    // Crear un nuevo controllador para la camara
+    // Este objeto permite interactuar con las librerias nativas en dispositivos moviles
+    cameraController =
+        CameraController(cameraDescription, ResolutionPreset.medium);
+
+    // Inicializar el controlador y configurar la camara
+    _initializeControllerFuture = cameraController.initialize().then((_) {
+      // Configuracion de la camara
+      cameraController.setFocusMode(FocusMode.locked);
+      cameraController.setFocusPoint(Offset(0.5, 0.5));
+      // Evitar el iniciar el streaming más de una vez
+      if (cameraController.value.isStreamingImages) return;
+      // Iniciar el streaming de imagenes desde la camara y predecir sobre ella
+      cameraController.startImageStream((CameraImage img) {
+        _imagePrediction(img);
+      });
+    });
+  }
+  // !SECTION InitCamera
+
+  // SECTION Detection
+  void _imagePrediction(CameraImage img) {
+    // Retornar si existe una detección en proceso.
+    if (isDetecting) return;
+    int startTime = new DateTime.now().millisecondsSinceEpoch;
+    isDetecting = true;
+    // NOTE Ejecutar modelo y obtener predicción
+    Tflite.runModelOnFrame(
+      bytesList: img.planes.map((plane) {
+        return plane.bytes;
+      }).toList(),
+      imageHeight: img.height,
+      imageWidth: img.width,
+      imageMean: 127.5,
+      imageStd: 127.5,
+      numResults: 4,
+      threshold: 0.5,
+    ).then((recognitions) {
+      int endTime = new DateTime.now().millisecondsSinceEpoch;
+      print("Detection took ${endTime - startTime}");
+      // Una vez obtenida una predicción detener el streaming
+      if (cameraController.value.isStreamingImages) {
+        cameraController.stopImageStream();
+      }
+      // NOTE Ejecutal "Callback"
+      widget.setRecognitions(recognitions);
+      isDetecting = false;
+    }).timeout(Duration(seconds: 5), onTimeout: () {
+      // Una vez obtenida una predicción detener el streaming
+      if (cameraController.value.isStreamingImages) {
+        cameraController.stopImageStream();
+      }
+      widget.setRecognitions(null);
+      isDetecting = false;
+    });
+    // });
+    // !SECTION Detection
+  }
+
+  // SECTION Mostrar la Camara
+  Widget cameraPreview() {
+    return FutureBuilder<void>(
+      future: _initializeControllerFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          // NOTE Una vez se cumpla el "future" mostar la camara
+          return FittedBox(
+            fit: BoxFit.fill,
+            child: Container(
+              width: widget.size,
+              height: cameraController.value.aspectRatio,
+              child: CameraPreview(cameraController),
+            ),
+          );
+        } else {
+          // NOTE De lo contrario mostrar un "loading"
+          return Center(
+            child: Container(
+              width: 50,
+              height: 50,
+              child: CircularProgressIndicator(),
+            ),
+          );
+        }
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    if (widget.controller == null || !widget.controller.value.isInitialized) {
-      return Container();
-    }
-
-/*
-    var tmp = MediaQuery.of(context).size;
-    var screenH = math.max(tmp.height, tmp.width);
-    var screenW = math.min(tmp.height, tmp.width);
-    tmp = widget.controller.value.previewSize;
-    var previewH = math.max(tmp.height, tmp.width);
-    var previewW = math.min(tmp.height, tmp.width);
-    var screenRatio = screenH / screenW;
-    var previewRatio = previewH / previewW;
-    return OverflowBox(
-      maxHeight:
-          screenRatio > previewRatio ? screenH : screenW / previewW * previewH,
-      maxWidth:
-          screenRatio > previewRatio ? screenH / previewH * previewW : screenW,
-      child: CameraPreview(controller),
-    );*/
-    return CameraPreview(widget.controller);
+    return cameraPreview();
   }
+  // !SECTION Mostrar la Camara
 }
