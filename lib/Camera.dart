@@ -64,7 +64,31 @@ class _CameraState extends State<Camera> {
       if (cameraController.value.isStreamingImages) return;
       // Iniciar el streaming de imagenes desde la camara y predecir sobre ella
       cameraController.startImageStream((CameraImage img) {
-        _imagePrediction(img);
+        if (isDetecting) return;
+        int startTime = new DateTime.now().millisecondsSinceEpoch;
+        isDetecting = true;
+        // NOTE Ejecutar modelo y obtener predicción
+        Tflite.runModelOnFrame(
+          bytesList: img.planes.map((plane) {
+            return plane.bytes;
+          }).toList(),
+          imageHeight: img.height,
+          imageWidth: img.width,
+          imageMean: 127.5,
+          imageStd: 127.5,
+          numResults: 4,
+          threshold: 0.7,
+        ).then((recognitions) {
+          int endTime = new DateTime.now().millisecondsSinceEpoch;
+          print("Detection took ${endTime - startTime}");
+          // Una vez obtenida una predicción detener el streaming
+          if (cameraController.value.isStreamingImages) {
+            cameraController.stopImageStream();
+          }
+          // NOTE Ejecutal "Callback"
+          widget.setRecognitions(recognitions);
+          isDetecting = false;
+        }).timeout(Duration(seconds: 5), onTimeout: _onTimeout);
       });
     });
   }
@@ -86,7 +110,7 @@ class _CameraState extends State<Camera> {
       imageMean: 127.5,
       imageStd: 127.5,
       numResults: 4,
-      threshold: 0.5,
+      threshold: 0.4,
     ).then((recognitions) {
       int endTime = new DateTime.now().millisecondsSinceEpoch;
       print("Detection took ${endTime - startTime}");
@@ -97,18 +121,22 @@ class _CameraState extends State<Camera> {
       // NOTE Ejecutal "Callback"
       widget.setRecognitions(recognitions);
       isDetecting = false;
-    }).timeout(Duration(seconds: 5), onTimeout: () {
-      // Una vez obtenida una predicción detener el streaming
-      if (cameraController.value.isStreamingImages) {
-        cameraController.stopImageStream();
-      }
-      widget.setRecognitions(null);
-      isDetecting = false;
-    });
+    }).timeout(Duration(seconds: 5), onTimeout: _onTimeout);
     // });
-    // !SECTION Detection
   }
 
+  void _onTimeout() {
+    // Una vez obtenida una predicción detener el streaming
+    if (cameraController.value.isStreamingImages) {
+      cameraController.stopImageStream();
+    }
+    dynamic data = {};
+    data["index"] = 0;
+    widget.setRecognitions(data);
+    isDetecting = false;
+  }
+
+  // !SECTION Detection
   // SECTION Mostrar la Camara
   Widget cameraPreview() {
     return FutureBuilder<void>(

@@ -18,11 +18,10 @@ class _DataScreenState extends State<DataScreen> {
   @override
   Widget build(BuildContext context) {
     // NOTE Callback hell
-    widget.say(pokemonData[widget.index].name).then((_) => widget
-        .say(pokemonData[widget.index].description)
-        .then((_) => widget.callback));
-
     PokemonData pokemon = pokemonData[widget.index];
+
+    widget.say(pokemon.name).then(
+        (_) => widget.say(pokemon.description).then((_) => widget.callback()));
 
     return Container(
       child: Column(
@@ -33,7 +32,7 @@ class _DataScreenState extends State<DataScreen> {
             height: 100,
             width: 100,
             child: FittedBox(
-              child: Image.asset('assets/9.gif'),
+              child: Image.asset(pokemon.img),
               fit: BoxFit.fill,
             ),
           ),

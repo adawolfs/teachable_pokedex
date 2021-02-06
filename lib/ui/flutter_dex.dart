@@ -4,7 +4,7 @@ import 'package:camera/camera.dart';
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:smart_flare/actors/smart_flare_actor.dart';
 import 'package:smart_flare/smart_flare.dart';
-import 'package:teachable_pokedex/Camerav2.dart';
+import 'package:teachable_pokedex/Camera.dart';
 import 'package:teachable_pokedex/ui/data_screen.dart';
 import 'package:teachable_pokedex/ui/sounds.dart';
 import 'package:tflite/tflite.dart';
@@ -23,8 +23,10 @@ const String ANIMATION_LIGHTS = "blue_light";
 // NOTE Rive File with UI
 const String FLUTTER_DEX_FILE = "assets/FlutterDex.flr";
 // NOTE TensorFlowLite Model
-const String TFLITE_MODEL = "assets/pokedex.tflite";
-const String TFLITE_LABELS = "assets/pokedex.txt";
+const String TFLITE_MODEL = "assets/converted_tflite/model_unquant.tflite";
+const String TFLITE_LABELS = "assets/converted_tflite/labels.txt";
+//const String TFLITE_MODEL = "assets/pokedex.tflite";
+// const String TFLITE_LABELS = "assets/pokedex.txt";
 
 // NOTE Debug vas
 const bool ENABLE_SMARTFLARE_DEBUG = false;
@@ -44,9 +46,9 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
   bool _modelLoaded;
   bool _speaking;
   bool _iteracting;
-  dynamic _pokemonDetected;
   String _display;
   String _upperBarAnimation;
+  dynamic _pokemonDetected;
 
   // NOTE: Camera instance
   Camera camera;
@@ -67,9 +69,9 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     _modelLoaded = false;
     _speaking = false;
     _iteracting = false;
-    _pokemonDetected = "";
     _display = IDLE;
     _upperBarAnimation = ANIMATION_IDLE;
+    _pokemonDetected = "";
   }
 
   loadVoice() async {
@@ -96,12 +98,13 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     setState(() {
       _recognitions = recognitions;
       _display = DATA;
-      if (_recognitions == null) {
-        _pokemonDetected = "pokemon not detected";
-      } else {
-        _pokemonDetected = _recognitions[0];
-      }
+      if (_recognitions.isEmpty) {
+        dynamic data = {};
+        data["index"] = 10;
+        _pokemonDetected = data;
+      } else {}
     });
+    _pokemonDetected = _recognitions[0];
   }
   // !SECTION Callback para manejar las predicciónes
 
@@ -124,6 +127,7 @@ class _FlareFlutterDexState extends State<FlareFlutterDex> {
     setState(() {
       _iteracting = false;
       _upperBarAnimation = ANIMATION_IDLE;
+      _display = IDLE;
     });
   }
 
