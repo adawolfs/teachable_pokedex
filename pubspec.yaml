@@ -1,5 +1,5 @@
 name: teachable_pokedex
-description: A new Flutter project.
+description: Mi primer Gran Proyecto de Machine Learning.
 
 # The following line prevents the package from being accidentally published to
 # pub.dev using `pub publish`. This is preferred for private packages.
@@ -23,14 +23,14 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  camera_camera: ^1.0.34+1
+  smart_flare:
+    path: /home/adawolfs/projects/flutter-projects/smart_flare
+  audioplayers: ^0.17.3
+  camera: ^0.7.0+2
+  flare_flutter: ^2.0.1
   flutter_tts: ^2.1.0
   image: ^2.1.19
   image_picker: ^0.6.7+22
-  flare_flutter: ^2.0.1
-  # TODO: Replace by builded vertion
-  smart_flare:
-    path: /home/adawolfs/projects/flutter-projects/smart_flare
   tflite: ^1.1.1
   tflite_flutter: ^0.5.0
   tflite_flutter_helper: ^0.1.2
@@ -52,6 +52,7 @@ flutter:
   # To add assets to your application, add an assets section, like this:
   assets:
     - assets/
+    - assets/sounds/
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
   # For details regarding adding assets from package dependencies, see
