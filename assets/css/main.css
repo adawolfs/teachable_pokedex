@@ -1,0 +1,135 @@
+html, body {
+    margin: 0;
+}
+
+.grid-container {
+    z-index: 4;
+    display: grid;
+    grid-template-columns: auto auto auto auto auto auto;
+
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%,-50%);
+}
+
+canvas{
+    max-width: 600px;
+}
+
+.grid-container > div {
+    z-index: 4;
+}
+
+div.screen {
+    grid-area: 2/6/1/1;
+    height: 300px;
+    text-align: center;
+    padding-left: 20px;
+}
+
+div.black_screen{
+    margin: 8%;
+    margin-bottom: 15%;
+    grid-area: 2/6/1/1;
+    top: 0px;
+    background-color: black;
+    max-width: 100%;
+    max-height: 100%;
+}
+
+#screen {
+    position: relative;
+    max-height: 100%;
+}
+
+#controls {
+    max-height: 100%;
+}
+
+div.controls {
+    text-align: center;
+    grid-column: 2/6;
+    height: 150px;
+}
+
+#base {
+    width: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    bottom: 0;
+    z-index: 0;
+}
+
+#lights {
+    width: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%, 0);
+    top: 0; 
+    z-index: 1;
+}
+
+@media screen and (max-width: 320px) {
+    div.screen {
+        height: 225px;
+        padding-left: 10px;
+    }
+
+    div.controls {
+        height: 110px;
+    }
+
+    .grid-container {
+        margin-top: 30px;
+    }
+    
+}
+
+@media (min-width: 321px) and (max-width: 415px) {
+    div.screen {
+        height: 300px;
+        padding-left: 10px;
+    }
+
+    .grid-container {
+        margin-top: 30px;
+    }
+}
+
+@media (min-width: 800px) and (max-width: 1980px) {
+    div.screen {
+        height: 450px;
+    }
+    div.controls {
+        height: 250px;
+    }
+    #controls {
+        max-height: 100%;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1980px) and (max-height: 1080px) {
+    .grid-container {
+        margin-top: 60px;
+    }
+    div.screen {
+        height: 350px;
+    }
+    div.controls {
+        height: 200px;
+    }
+}
+
+@media (width: 768px) and (height: 1024px) {
+    .grid-container {
+        margin-top: 60px;
+    }
+    div.screen {
+        height: 450px;
+    }
+    div.controls {
+        height: 200px;
+    }
+}
