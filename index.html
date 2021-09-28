@@ -47,7 +47,7 @@
                 ></canvas>
             </div>
             <div class="controls-overlay">
-                <div class="button_a" x-data @click="$store.camera.busy=true; $store.controls.a()"></div>
+                <div class="button_a" x-data @click="$store.controls.a()"></div>
                 <div class="button_red" x-data @click="$store.controls.red()"></div>
                 <div class="button_blue" x-data @click="$store.controls.blue()"></div>
                 <div class="button_arrows">
@@ -65,8 +65,9 @@
     </div>
     <script src="https://unpkg.com/rive-js@0.7.30/dist/rive.min.js"></script>
     <script src="./assets/js/pokedex_ui.js"></script>
-    <script src="./assets/js/pokedex_ml.js"></script>
     <script src="./assets/js/alpine.js"></script>
+    <script src="./assets/js/pokedex_ml.js"></script>
+    <script src="./assets/js/pokedex_speech.js"></script>
     <script type="text/javascript">
         // document.getElementById('controls').onclick = function(event) {
         //     init("black_screen");

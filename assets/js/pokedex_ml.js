@@ -4,7 +4,6 @@
 // the link to your model provided by Teachable Machine export panel
 const URL = "assets/my_model/";
 var runningCamera = false;
-var makePrediction = false;
 
 let model, webcam, labelContainer, maxPredictions;
 
@@ -38,7 +37,7 @@ async function init(containerId, _deviceId) {
 
 async function loop() {
     webcam.update(); // update the webcam frame
-    if (makePrediction) {
+    if (Alpine.store('camera').makePrediction) {
         await predict();
     }
     window.requestAnimationFrame(loop);
@@ -51,7 +50,10 @@ async function predict() {
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction =
             prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-        console.log(classPrediction);
+        if (prediction[i].probability > 0.8) {
+            console.log(classPrediction); 
+            speak( prediction[i].className)
+            Alpine.store('camera').makePrediction = false;
+        }
     }
-    makePrediction = false;
 }
