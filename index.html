@@ -22,6 +22,7 @@
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#760000" />
     <link rel="stylesheet" href="./assets/css/main.css">
+    <script src="//unpkg.com/alpinejs" type="module" ></script>
 </head>
 <body>
     <div class="pokedex">
@@ -32,13 +33,32 @@
             <canvas id="base"></canvas>
         </div>
         <div class="grid-container">
-            <div id="black_screen" class="black_screen"></div>
+            <div id="black_screen" class="black_screen" x-data='{devices: [0]}'>
+                <template x-if="!$store.camera.busy">
+                    <div class="screen-ui">
+                        <template x-for="(device,key) in $store.devices">
+                            <div x-text="'Camera: ' + key" :class="$store.camera.isSelected(key) && 'camera-selected'"></div>></div>
+                        </template>
+                    </div>
+                </template>
+            </div>
             <div class="screen">
                 <canvas id="screen"
                 ></canvas>
             </div>
+            <div class="controls-overlay">
+                <div class="button_a" x-data @click="$store.camera.busy=true; $store.controls.a()"></div>
+                <div class="button_red" x-data @click="$store.controls.red()"></div>
+                <div class="button_blue" x-data @click="$store.controls.blue()"></div>
+                <div class="button_arrows">
+                    <div class="button_up" x-data @click="$store.controls.up()"></div>
+                    <div class="button_down" x-data @click="$store.controls.down()"></div>
+                    <div class="button_left" x-data @click="$store.controls.left()"></div>
+                    <div class="button_right" x-data @click="$store.controls.right()"></div>
+                </div>
+            </div>
             <div class="controls">
-                <canvas id="controls"
+                <canvas id="controls" x-data @click="init('black_screen')"
                ></canvas>
             </div>
         </div>
@@ -46,12 +66,11 @@
     <script src="https://unpkg.com/rive-js@0.7.30/dist/rive.min.js"></script>
     <script src="./assets/js/pokedex_ui.js"></script>
     <script src="./assets/js/pokedex_ml.js"></script>
+    <script src="./assets/js/alpine.js"></script>
     <script type="text/javascript">
-        document.getElementById('controls').onclick = function(event) {
-            init("black_screen");
-        }
+        // document.getElementById('controls').onclick = function(event) {
+        //     init("black_screen");
+        // }
     </script>
-
-
 </body>
 </html>

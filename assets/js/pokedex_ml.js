@@ -4,11 +4,12 @@
 // the link to your model provided by Teachable Machine export panel
 const URL = "assets/my_model/";
 var runningCamera = false;
+var makePrediction = false;
 
 let model, webcam, labelContainer, maxPredictions;
 
 // Load the image model and setup the webcam
-async function init(containerId) {
+async function init(containerId, _deviceId) {
     if (runningCamera) {
         return
     }
@@ -25,7 +26,7 @@ async function init(containerId) {
     // Convenience function to setup a webcam
     const flip = false; // whether to flip the webcam
     webcam = new tmImage.Webcam(container.offsetWidth, container.offsetHeight - 10, flip); // width, height, flip
-    await webcam.setup(); // request access to the webcam
+    await webcam.setup({deviceId:{exact: _deviceId}}); // request access to the webcam
     await webcam.play();
     window.requestAnimationFrame(loop);
 
@@ -37,7 +38,9 @@ async function init(containerId) {
 
 async function loop() {
     webcam.update(); // update the webcam frame
-    await predict();
+    if (makePrediction) {
+        await predict();
+    }
     window.requestAnimationFrame(loop);
 }
 
@@ -48,5 +51,7 @@ async function predict() {
     for (let i = 0; i < maxPredictions; i++) {
         const classPrediction =
             prediction[i].className + ": " + prediction[i].probability.toFixed(2);
+        console.log(classPrediction);
     }
+    makePrediction = false;
 }
