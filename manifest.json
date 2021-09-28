@@ -1,0 +1,35 @@
+{
+    "name": "Teachable Pokedex",
+    "short_name": "Pokedex",
+    "start_url": ".",
+    "display": "standalone",
+    "background_color": "#760000",
+    "theme_color": "#760000",
+    "description": "A pokedex made with teachable machine",
+    "orientation": "portrait",
+    "prefer_related_applications": false,
+    "icons": [
+        {
+            "src": "icons/icon.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/icon.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        },
+        {
+            "src": "icons/icon.png",
+            "sizes": "192x192",
+            "type": "image/png",
+            "purpose": "maskable"
+        },
+        {
+            "src": "icons/Icon-maskable-512.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "maskable"
+        }
+    ]
+}
