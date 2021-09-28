@@ -7,9 +7,7 @@ import 'package:camera/camera.dart';
 typedef void Callback(List<dynamic> list);
 
 class Camera extends StatefulWidget {
-  final Callback setRecognitions;
-  final double size;
-  Camera(this.setRecognitions, this.size, {Key? key}) : super(key: key);
+  Camera({Key? key}) : super(key: key);
 
   @override
   _CameraState createState() => _CameraState();

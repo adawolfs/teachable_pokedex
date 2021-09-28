@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:rive/rive.dart';
-import 'package:teachable_pokedex/camera.dart';
+import 'package:teachable_pokedex/ui/camera.dart';
 
 class RiveLoader extends StatefulWidget {
   RiveLoader({Key? key}) : super(key: key);
@@ -123,7 +123,7 @@ class _RiveLoaderState extends State<RiveLoader> {
               child: Container(
                 margin: const EdgeInsets.fromLTRB(10, 10, 20, 55),
                 color: Colors.black,
-                child: Camera((r) {}, 280),
+                child: Camera(),
               ),
             ),
           ),
