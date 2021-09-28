@@ -2,6 +2,7 @@ document.addEventListener('alpine:init',() => {
     Alpine.store('devices', []);
     Alpine.store('camera', {
         selected:0,
+        makePrediction:false,
         isSelected(key){
             return key == this.selected 
         },
@@ -9,9 +10,13 @@ document.addEventListener('alpine:init',() => {
     })
     Alpine.store('cameraContext', {
         a(){
-            device = Alpine.store('devices')[Alpine.store('camera').selected]
-            
-            init('black_screen',device.deviceId) 
+            if(Alpine.store('camera').busy) {
+                Alpine.store('camera').makePrediction = true;
+            } else {
+                device = Alpine.store('devices')[Alpine.store('camera').selected]
+                init('black_screen',device.deviceId)
+                Alpine.store('camera').busy = true
+            }
         }, 
         red(){
             console.log('red');
