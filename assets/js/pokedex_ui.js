@@ -1,8 +1,5 @@
 (function() {
-
-    navigator.mediaDevices.enumerateDevices().then((devices) =>{
-        console.log(devices);
-    });
+   
     const _lights_canvas = document.getElementById('lights');
     const _base_canvas = document.getElementById('base');
     const _controls_canvas = document.getElementById('controls');

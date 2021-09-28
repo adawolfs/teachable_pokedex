@@ -22,20 +22,25 @@ canvas{
 }
 
 div.screen {
-    grid-area: 2/6/1/1;
+    grid-area: 1/1/span 1 / span 6;
     height: 300px;
     text-align: center;
     padding-left: 20px;
 }
 
+div.screen-ui {
+    padding: 10%;
+}
+
 div.black_screen{
     margin: 8%;
     margin-bottom: 15%;
-    grid-area: 2/6/1/1;
+    grid-area: 1/1/span 1 / span 6;
     top: 0px;
     background-color: black;
     max-width: 100%;
     max-height: 100%;
+    color: white;
 }
 
 #screen {
@@ -43,13 +48,54 @@ div.black_screen{
     max-height: 100%;
 }
 
+div.controls-overlay{
+    grid-area: 2 / 1 / span 1 / span 6;
+    width: 100%;
+    height: 150px;
+    top: 0px;
+    z-index: 50;
+    display: grid;
+    grid-gap: 0px 10px;
+    padding-top: 5px;
+}
+
+div.button_a {
+    grid-area: 2 / 1 / span 2 / span 1;
+
+}
+div.button_red {
+    grid-area: 1 / 2 / span 1 / span 1;
+}
+div.button_blue {
+    grid-area: 1 / 3 / span 1 / span 1;
+}
+div.button_arrows{
+    grid-area: 1 / 4 / span 3 / span 2;
+    display: grid;
+}
+
+div.button_up {
+    grid-area: 1 / 1 / span 1  / span 3;
+}
+div.button_left {
+    grid-area: 2 / 1 / span 1  / span 1;
+}
+div.button_right {
+    grid-area: 2 / 3 / span 1  / span 1;
+}
+div.button_down {
+    grid-area: 3 / 1 / span 1  / span 3;
+}
+
 #controls {
+    top: 0px;
     max-height: 100%;
 }
 
 div.controls {
+    position: relative;
     text-align: center;
-    grid-column: 2/6;
+    grid-area: 2 / 1 / span 1 / span 6;
     height: 150px;
 }
 
@@ -132,4 +178,9 @@ div.controls {
     div.controls {
         height: 200px;
     }
+}
+
+
+.camera-selected{
+    background-color: red;
 }
