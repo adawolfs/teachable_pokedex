@@ -10,7 +10,7 @@ document.addEventListener('alpine:init',() => {
     })
     Alpine.store('vr', {
         selected:0,
-        pokemon:['bulbasaur','charmander'],
+        pokemon:['bulbasaur','charmander', 'squirtle', 'pikachu'],
         isSelected(key){
             return key == this.selected 
         },

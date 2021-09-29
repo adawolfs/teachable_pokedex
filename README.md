@@ -7,6 +7,9 @@ This example was made using
 - AlpineJS
 - TensorFlowJS
 - Google Teachable Machine
+- A-Frame
+- GitHub Actions
+- GitHub Pages
 
 # Demo
 
