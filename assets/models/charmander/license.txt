@@ -1,0 +1,11 @@
+Model Information:
+* title:	pokemon ヒトカゲ Charmander
+* source:	https://sketchfab.com/3d-models/pokemon-charmander-06aa094f46be450899b82ab767931b9c
+* author:	kishi (https://sketchfab.com/ash.takafumi)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "pokemon ヒトカゲ Charmander" (https://sketchfab.com/3d-models/pokemon-charmander-06aa094f46be450899b82ab767931b9c) by kishi (https://sketchfab.com/ash.takafumi) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

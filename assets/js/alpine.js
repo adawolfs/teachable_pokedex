@@ -10,6 +10,7 @@ document.addEventListener('alpine:init',() => {
     })
     Alpine.store('cameraContext', {
         a(){
+            playPressA()
             if(Alpine.store('camera').busy) {
                 Alpine.store('camera').makePrediction = true;
             } else {
@@ -19,7 +20,12 @@ document.addEventListener('alpine:init',() => {
             }
         }, 
         red(){
-            console.log('red');
+            if(Alpine.store('camera').busy) {
+                webcam.stop()
+                container = document.getElementById('black_screen')
+                container.removeChild(document.getElementById('camera'))
+                Alpine.store('camera').busy = false
+            }
         },
         blue(){
             console.log('blue');

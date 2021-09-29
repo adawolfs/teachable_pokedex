@@ -3,15 +3,11 @@
 
 // the link to your model provided by Teachable Machine export panel
 const URL = "assets/my_model/";
-var runningCamera = false;
 
 let model, webcam, labelContainer, maxPredictions;
 
 // Load the image model and setup the webcam
 async function init(containerId, _deviceId) {
-    if (runningCamera) {
-        return
-    }
     const modelURL = URL + "model.json";
     const metadataURL = URL + "metadata.json";
     const container = document.getElementById(containerId)
@@ -30,9 +26,9 @@ async function init(containerId, _deviceId) {
     window.requestAnimationFrame(loop);
 
     // append elements to the DOM
+    webcam.canvas.id = "camera";
     container.appendChild(webcam.canvas);
     //container.removeChild(container.childNodes[0]);
-    runningCamera = true;
 }
 
 async function loop() {
