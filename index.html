@@ -36,8 +36,15 @@
             <div id="black_screen" class="black_screen" x-data='{devices: [0]}'>
                 <template x-if="!$store.camera.busy">
                     <div class="screen-ui">
-                        <template x-for="(device,key) in $store.devices">
-                            <div x-text="'Camera: ' + key" :class="$store.camera.isSelected(key) && 'camera-selected'"></div>></div>
+                        <template x-if="$store.context.name == 'camera'" >
+                            <template  x-for="(device,key) in $store.devices">
+                                <div x-text="'Camera: ' + key" :class="$store.camera.isSelected(key) && 'camera-selected'"></div>></div>
+                            </template>
+                        </template>
+                        <template x-if="$store.context.name == 'vr'">
+                            <template  x-for="(pokemon,key) in $store.vr.pokemon">
+                                <div x-text="pokemon" :class="$store.vr.isSelected(key) && 'camera-selected'"></div>></div>
+                            </template>
                         </template>
                     </div>
                 </template>

@@ -2,8 +2,8 @@
 <html>
 
 <head>
-    <title>GuateGeeks</title>
-    <meta name="description" content="GuateGeeks">
+    <title>PokeAR</title>
+    <meta name="description" content="PokeAR">
     <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
     <script src="//unpkg.com/alpinejs" type="module" ></script>
@@ -12,10 +12,12 @@
     <a-scene webxr="requiredFeatures: hit-test,local-floor;
     optionalFeatures: dom-overlay,unbounded;
     overlayElement: #overlay;"
-        inspector="https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js">
+        inspector="https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js"
+        background="color: black">
         <a-assets>
             <a-asset-item id="charmander" src="assets/models/charmander/scene.gltf"></a-asset-item>
             <a-asset-item id="bulbasaur" src="assets/models/bulbasaur/scene.gltf"></a-asset-item>
+            <img id="background" src="assets/img/background.png" >
         </a-assets>
         <a-entity x-data="{pokemon: new URLSearchParams(location.search).get('pokemon')}"
           :gltf-model="'#' + pokemon"  position="0 2 -4" animation-mixer></a-entity>
