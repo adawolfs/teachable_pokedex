@@ -1,0 +1,11 @@
+Model Information:
+* title:	007 Squirtle
+* source:	https://sketchfab.com/3d-models/007-squirtle-102ca3237aac44a6b5b15d6e3fbdc1df
+* author:	A-Z inc. (https://sketchfab.com/AnimeLover200)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "007 Squirtle" (https://sketchfab.com/3d-models/007-squirtle-102ca3237aac44a6b5b15d6e3fbdc1df) by A-Z inc. (https://sketchfab.com/AnimeLover200) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
