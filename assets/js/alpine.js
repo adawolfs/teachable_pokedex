@@ -8,9 +8,16 @@ document.addEventListener('alpine:init',() => {
         },
         busy:false
     })
-    Alpine.store('cameraContext', {
+    Alpine.store('vr', {
+        selected:0,
+        pokemon:['bulbasaur','charmander'],
+        isSelected(key){
+            return key == this.selected 
+        },
+        busy:false
+    })
+    Alpine.store('camera_actions', {
         a(){
-            playPressA()
             if(Alpine.store('camera').busy) {
                 Alpine.store('camera').makePrediction = true;
             } else {
@@ -28,7 +35,10 @@ document.addEventListener('alpine:init',() => {
             }
         },
         blue(){
-            console.log('blue');
+            Alpine.store('context', {
+                actions: Alpine.store('vr_actions'),
+                name: 'vr',
+            })
         },
         up(){
             Alpine.store('camera').selected--
@@ -51,26 +61,64 @@ document.addEventListener('alpine:init',() => {
             console.log('right');
         }
     })
-    navigator.mediaDevices.enumerateDevices().then((devices) =>{
-        console.log(devices);
-        Alpine.store('devices', devices.filter(device => device.kind === 'videoinput'));
-    });
-
-    Alpine.store('controls', {
+    Alpine.store('vr_actions', {
         a(){
-            Alpine.store('cameraContext').a();
+            pokemon = Alpine.store('vr').pokemon[Alpine.store('vr').selected]
+            window.location.href = `/vr.html?pokemon=${pokemon}`
+            console.log(pokemon)
         }, 
         red(){
-            Alpine.store('cameraContext').red();
+            Alpine.store('currentContext').red();
         },
         blue(){
             console.log('blue');
         },
         up(){
-            Alpine.store('cameraContext').up();
+            Alpine.store('vr').selected--
+            if (Alpine.store('vr').selected < 0) {
+                Alpine.store('vr').selected = Alpine.store('vr').pokemon.length - 1
+            }
         },
         down(){
-            Alpine.store('cameraContext').down();
+            if (Alpine.store('vr').selected < Alpine.store('vr').pokemon.length) {
+                Alpine.store('vr').selected++
+            }
+            if (Alpine.store('vr').selected >= Alpine.store('vr').pokemon.length) {
+                Alpine.store('vr').selected = 0
+            }
+        },
+        left(){
+            console.log('left');
+        }, 
+        right(){
+            console.log('right');
+        }
+    })
+    Alpine.store('context', {
+        actions: Alpine.store('camera_actions'),
+        name: 'camera',
+    })
+    navigator.mediaDevices.enumerateDevices().then((devices) =>{
+        console.log(devices.filter(device => device.kind === 'videoinput'));
+        Alpine.store('devices', devices.filter(device => device.kind === 'videoinput'));
+    });
+
+    Alpine.store('controls', {
+        a(){
+            playPressA()
+            Alpine.store('context').actions.a();
+        }, 
+        red(){
+            Alpine.store('context').actions.red();
+        },
+        blue(){
+            Alpine.store('context').actions.blue();
+        },
+        up(){
+            Alpine.store('context').actions.up();
+        },
+        down(){
+            Alpine.store('context').actions.down();
         },
         left(){
             console.log('left');
