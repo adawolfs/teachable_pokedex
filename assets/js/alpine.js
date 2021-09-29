@@ -64,7 +64,7 @@ document.addEventListener('alpine:init',() => {
     Alpine.store('vr_actions', {
         a(){
             pokemon = Alpine.store('vr').pokemon[Alpine.store('vr').selected]
-            window.location.href = `/vr.html?pokemon=${pokemon}`
+            window.location.href = `vr.html?pokemon=${pokemon}`
             console.log(pokemon)
         }, 
         red(){
