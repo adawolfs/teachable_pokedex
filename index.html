@@ -70,6 +70,17 @@
             </div>
         </div>
     </div>
+    <script>
+        async function startCamera() {
+            const constraints = { video: { facingMode: { exact: "environment" } } }; // Prefer rear camera
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia(constraints);
+            } catch (err) {
+                console.error("Error accessing camera:", err);
+            }
+        }
+        startCamera();
+    </script>
     <script src="https://unpkg.com/rive-js@0.7.30/dist/rive.min.js"></script>
     <script src="./assets/js/pokedex_ui.js"></script>
     <script src="./assets/js/alpine.js"></script>
