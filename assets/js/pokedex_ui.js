@@ -1,61 +1,80 @@
-(function() {
-   
-    const _lights_canvas = document.getElementById('lights');
-    const _base_canvas = document.getElementById('base');
-    const _controls_canvas = document.getElementById('controls');
-    const _screen_canvas = document.getElementById('screen');
-    const _screen_ctx = _screen_canvas.getContext('2d');
-    const _screen_container = document.getElementsByClassName('screen')[0];
-    // resize the canvas to fill browser window dynamically
-    window.addEventListener('resize', resizeCanvas, false);
-            
-    function resizeCanvas() {
-        _lights_canvas.width = 1000;
-        _lights_canvas.height = 1500;
-        _base_canvas.width = 1000;
-        _base_canvas.height = 1500;
+(function () {
+  "use strict";
 
-        _controls_canvas.width = 1000;
-        _controls_canvas.height = 500;
-        _screen_canvas.width = 1000;
-        _screen_canvas.height = 1000;
-                    
-        /**
-         * Your drawings need to be inside this function otherwise they will be reset when 
-         * you resize the browser window and the canvas goes will be cleared.
-         */
-        drawStuff(); 
+  const lightsCanvas = document.getElementById("lights");
+  const baseCanvas = document.getElementById("base");
+  const controlsCanvas = document.getElementById("controls");
+  const screenCanvas = document.getElementById("screen");
+  const reduceMotion = window.matchMedia(
+    "(prefers-reduced-motion: reduce)",
+  ).matches;
+  const riveFile = "assets/rive/pokedex.riv";
+
+  let resizeTimer = null;
+  let lights = null;
+  let base = null;
+
+  function resizeCanvas() {
+    lightsCanvas.width = 1000;
+    lightsCanvas.height = 1500;
+    baseCanvas.width = 1000;
+    baseCanvas.height = 1500;
+    controlsCanvas.width = 1000;
+    controlsCanvas.height = 500;
+    screenCanvas.width = 1000;
+    screenCanvas.height = 1000;
+
+    if (lights) {
+      lights.layout = new rive.Layout({
+        fit: rive.Fit.FitWidth,
+        alignment: rive.Alignment.TopCenter,
+      });
     }
-    
-    resizeCanvas();
-            
-    function drawStuff() {
-        const rive_pokedex_ui = 'assets/rive/pokedex.riv';
-        const lights = new rive.Rive({
-            src: rive_pokedex_ui,
-            canvas: document.getElementById('lights'),
-            artboard: 'lights',
-            autoplay: false,
-        });
-        const base = new rive.Rive({
-            src: rive_pokedex_ui,
-            canvas: document.getElementById('base'),
-            artboard: 'base',
-            autoplay: false,
-        });
-        const screen = new rive.Rive({
-            src: rive_pokedex_ui,
-            canvas: document.getElementById('screen'),
-            artboard: 'screen',
-            autoplay: false,
-        });
-        const controls = new rive.Rive({
-            src: rive_pokedex_ui,
-            canvas: document.getElementById('controls'),
-            artboard: 'controls',
-            autoplay: false,
-        });
-        lights.layout = new rive.Layout({fit: rive.Fit.FitWidth, alignment: rive.Alignment.TopCenter});
-        base.layout = new rive.Layout({fit: rive.Fit.FitWidth, alignment: rive.Alignment.BottomCenter});
+    if (base) {
+      base.layout = new rive.Layout({
+        fit: rive.Fit.FitWidth,
+        alignment: rive.Alignment.BottomCenter,
+      });
     }
+  }
+
+  function initRive() {
+    lights = new rive.Rive({
+      src: riveFile,
+      canvas: lightsCanvas,
+      artboard: "lights",
+      autoplay: !reduceMotion,
+    });
+
+    base = new rive.Rive({
+      src: riveFile,
+      canvas: baseCanvas,
+      artboard: "base",
+      autoplay: !reduceMotion,
+    });
+
+    new rive.Rive({
+      src: riveFile,
+      canvas: screenCanvas,
+      artboard: "screen",
+      autoplay: !reduceMotion,
+    });
+
+    new rive.Rive({
+      src: riveFile,
+      canvas: controlsCanvas,
+      artboard: "controls",
+      autoplay: !reduceMotion,
+    });
+  }
+
+  window.addEventListener("resize", () => {
+    if (resizeTimer) {
+      window.clearTimeout(resizeTimer);
+    }
+    resizeTimer = window.setTimeout(resizeCanvas, 180);
+  });
+
+  resizeCanvas();
+  initRive();
 })();

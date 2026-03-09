@@ -16,78 +16,77 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
     <meta name="apple-mobile-web-app-title" content="Teachable Pokedex">
     <link rel="apple-touch-icon" href="./assets/icons/icon.png">
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js"></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://cdn.jsdelivr.net https://unpkg.com 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net https://unpkg.com data:; worker-src 'self' blob:; object-src 'none'; base-uri 'self'">
+    <script defer src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js" integrity="sha384-LBtUZzDp17Y7UgB/KFromf1LnY7o5ls8Oxm4vEAoTM0U+JzaadctX2/buQiNHyQU" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8/dist/teachablemachine-image.min.js" integrity="sha384-4Q4fzaRr/bPyBiOertaWuZ8Zn987vAWqtNLbL6h+tf/Y+flpirtyqFTd7q9ELxjS" crossorigin="anonymous"></script>
     <title>Pokedex</title>
     <link rel="manifest" href="manifest.json" />
     <meta name="theme-color" content="#760000" />
     <link rel="stylesheet" href="./assets/css/main.css">
-    <script src="//unpkg.com/alpinejs" type="module" ></script>
 </head>
 <body>
-    <div class="pokedex">
+    <a class="skip-link" href="#controls-overlay">Skip to controls</a>
+    <div id="prediction-status" class="sr-only" role="status" aria-live="polite" aria-atomic="true"></div>
+    <main class="pokedex" role="main" aria-label="Teachable Pokedex">
         <div class="lights">
-            <canvas id="lights"></canvas>
+            <canvas id="lights" role="img" aria-label="Pokedex indicator lights"></canvas>
         </div>
         <div class="base">
-            <canvas id="base"></canvas>
+            <canvas id="base" role="img" aria-label="Pokedex base"></canvas>
         </div>
         <div class="grid-container">
             <div id="black_screen" class="black_screen" x-data='{devices: [0]}'>
                 <template x-if="!$store.camera.busy">
-                    <div class="screen-ui">
+                    <div class="screen-ui" role="region" aria-label="Selection panel">
                         <template x-if="$store.context.name == 'camera'" >
-                            <template  x-for="(device,key) in $store.devices">
-                                <div x-text="'Camera: ' + key" :class="$store.camera.isSelected(key) && 'camera-selected'"></div>></div>
+                            <ul class="selection-list" role="listbox" aria-label="Camera selection">
+                            <template  x-for="(device,key) in $store.devices" :key="device.deviceId">
+                                <li role="option" :aria-selected="$store.camera.isSelected(key)" x-text="device.label || 'Camera ' + (key + 1)" :class="$store.camera.isSelected(key) && 'camera-selected'"></li>
                             </template>
+                            </ul>
                         </template>
                         <template x-if="$store.context.name == 'vr'">
-                            <template  x-for="(pokemon,key) in $store.vr.pokemon">
-                                <div x-text="pokemon" :class="$store.vr.isSelected(key) && 'camera-selected'"></div>></div>
+                            <ul class="selection-list" role="listbox" aria-label="Pokemon selection">
+                            <template  x-for="(pokemon,key) in $store.vr.pokemon" :key="pokemon">
+                                <li role="option" :aria-selected="$store.vr.isSelected(key)" x-text="pokemon" :class="$store.vr.isSelected(key) && 'camera-selected'"></li>
                             </template>
+                            </ul>
                         </template>
                     </div>
                 </template>
             </div>
             <div class="screen">
-                <canvas id="screen"
-                ></canvas>
+                <canvas id="screen" role="img" aria-label="Pokedex screen"></canvas>
             </div>
-            <div class="controls-overlay">
-                <div class="button_a" x-data @click="$store.controls.a()"></div>
-                <div class="button_red" x-data @click="$store.controls.red()"></div>
-                <div class="button_blue" x-data @click="$store.controls.blue()"></div>
-                <div class="button_arrows">
-                    <div class="button_up" x-data @click="$store.controls.up()"></div>
-                    <div class="button_down" x-data @click="$store.controls.down()"></div>
-                    <div class="button_left" x-data @click="$store.controls.left()"></div>
-                    <div class="button_right" x-data @click="$store.controls.right()"></div>
+            <div class="controls-overlay" id="controls-overlay" role="group" aria-label="Pokedex controls">
+                <button class="button_a" type="button" aria-label="A button confirm" x-data @click="$store.controls.a()"></button>
+                <button class="button_red" type="button" aria-label="Red button stop" x-data @click="$store.controls.red()"></button>
+                <button class="button_blue" type="button" aria-label="Blue button switch mode" x-data @click="$store.controls.blue()"></button>
+                <div class="button_arrows" role="group" aria-label="Directional buttons">
+                    <button class="button_up" type="button" aria-label="Up" x-data @click="$store.controls.up()"></button>
+                    <button class="button_down" type="button" aria-label="Down" x-data @click="$store.controls.down()"></button>
+                    <button class="button_left" type="button" aria-label="Left" x-data @click="$store.controls.left()"></button>
+                    <button class="button_right" type="button" aria-label="Right" x-data @click="$store.controls.right()"></button>
                 </div>
             </div>
             <div class="controls">
-                <canvas id="controls"
-               ></canvas>
+                <canvas id="controls" role="img" aria-label="Pokedex control panel"></canvas>
             </div>
         </div>
-    </div>
+    </main>
+    <script defer src="https://unpkg.com/rive-js@0.7.30/dist/rive.min.js" integrity="sha384-XHMOdBBKwdg+bxyslnG1uLaOxyfQQXXfAEUb9LY1K0BfHznBX3mbuFsrafFbTH6Y" crossorigin="anonymous"></script>
+    <script defer src="./assets/js/pokedex_ui.js"></script>
+    <script defer src="./assets/js/pokedex_ml.js"></script>
+    <script defer src="./assets/js/pokedex_speech.js"></script>
+    <script defer src="./assets/js/pokedex_sound.js"></script>
+    <script defer src="./assets/js/alpine.js"></script>
+    <script defer src="https://unpkg.com/alpinejs@3.14.9/dist/cdn.min.js" integrity="sha384-9Ax3MmS9AClxJyd5/zafcXXjxmwFhZCdsT6HJoJjarvCaAkJlk5QDzjLJm+Wdx5F" crossorigin="anonymous"></script>
     <script>
-        async function startCamera() {
-            const constraints = { video: { facingMode: { exact: "environment" } } }; // Prefer rear camera
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia(constraints);
-            } catch (err) {
-                console.error("Error accessing camera:", err);
-            }
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
         }
-        startCamera();
-    </script>
-    <script src="https://unpkg.com/rive-js@0.7.30/dist/rive.min.js"></script>
-    <script src="./assets/js/pokedex_ui.js"></script>
-    <script src="./assets/js/alpine.js"></script>
-    <script src="./assets/js/pokedex_ml.js"></script>
-    <script src="./assets/js/pokedex_speech.js"></script>
-    <script src="./assets/js/pokedex_sound.js"></script>
-    <script type="text/javascript">
     </script>
 </body>
 </html>
