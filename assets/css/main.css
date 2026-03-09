@@ -100,7 +100,7 @@ div.black_screen {
 .controls-overlay {
   grid-area: 2 / 1 / span 1 / span 6;
   width: 100%;
-  height: 150px;
+  height: 130px;
   position: relative;
   top: 0px;
   z-index: 50;
@@ -110,7 +110,7 @@ div.black_screen {
 }
 
 .button_a {
-  grid-area: 2 / 1 / span 2 / span 1;
+  grid-area: 1 / 1 / span 3 / span 1;
 }
 .button_red {
   grid-area: 1 / 2 / span 1 / span 1;
@@ -120,6 +120,8 @@ div.black_screen {
 }
 .button_arrows {
   grid-area: 1 / 4 / span 3 / span 2;
+  grid-template-columns: 30px 20px 30px;
+  grid-template-rows: 60px 30px 60px;
   display: grid;
 }
 
