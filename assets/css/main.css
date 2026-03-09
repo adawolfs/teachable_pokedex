@@ -190,6 +190,10 @@ div.controls {
 }
 
 @media screen and (max-width: 320px) {
+  #camera {
+    max-width: 270px!important;
+    max-height: 220px;
+  }
   div.screen {
     height: 225px;
     padding-left: 10px;
@@ -205,6 +209,11 @@ div.controls {
 }
 
 @media (min-width: 321px) and (max-width: 415px) {
+  #camera {
+    max-width: 270px!important;
+    max-height: 220px;
+  }
+
   div.screen {
     height: 300px;
     padding-left: 10px;
@@ -213,6 +222,14 @@ div.controls {
   .grid-container {
     margin-top: 30px;
   }
+}
+
+@media (min-width: 415px) and (max-width: 767px) {
+  #camera {
+    max-width: 270px!important;
+    max-height: 220px;
+  }
+
 }
 
 @media (min-width: 800px) and (max-width: 1980px) {
