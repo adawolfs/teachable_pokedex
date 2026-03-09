@@ -59,14 +59,14 @@
                 <canvas id="screen" role="img" aria-label="Pokedex screen"></canvas>
             </div>
             <div class="controls-overlay" id="controls-overlay" role="group" aria-label="Pokedex controls">
-                <button class="button_a" type="button" aria-label="A button confirm" x-data @click="$store.controls.a()"></button>
-                <button class="button_red" type="button" aria-label="Red button stop" x-data @click="$store.controls.red()"></button>
-                <button class="button_blue" type="button" aria-label="Blue button switch mode" x-data @click="$store.controls.blue()"></button>
+                <button class="button_a" type="button" aria-label="A button confirm" x-data @touchstart.prevent="$store.controls.a()" @click="$store.controls.a()"></button>
+                <button class="button_red" type="button" aria-label="Red button stop" x-data @touchstart.prevent="$store.controls.red()" @click="$store.controls.red()"></button>
+                <button class="button_blue" type="button" aria-label="Blue button switch mode" x-data @touchstart.prevent="$store.controls.blue()" @click="$store.controls.blue()"></button>
                 <div class="button_arrows" role="group" aria-label="Directional buttons">
-                    <button class="button_up" type="button" aria-label="Up" x-data @click="$store.controls.up()"></button>
-                    <button class="button_down" type="button" aria-label="Down" x-data @click="$store.controls.down()"></button>
-                    <button class="button_left" type="button" aria-label="Left" x-data @click="$store.controls.left()"></button>
-                    <button class="button_right" type="button" aria-label="Right" x-data @click="$store.controls.right()"></button>
+                    <button class="button_up" type="button" aria-label="Up" x-data @touchstart.prevent="$store.controls.up()" @click="$store.controls.up()"></button>
+                    <button class="button_down" type="button" aria-label="Down" x-data @touchstart.prevent="$store.controls.down()" @click="$store.controls.down()"></button>
+                    <button class="button_left" type="button" aria-label="Left" x-data @touchstart.prevent="$store.controls.left()" @click="$store.controls.left()"></button>
+                    <button class="button_right" type="button" aria-label="Right" x-data @touchstart.prevent="$store.controls.right()" @click="$store.controls.right()"></button>
                 </div>
             </div>
             <div class="controls">
