@@ -1,55 +1,129 @@
-// More API functions here:
-// https://github.com/googlecreativelab/teachablemachine-community/tree/master/libraries/image
+(function () {
+  "use strict";
 
-// the link to your model provided by Teachable Machine export panel
-const URL = "assets/my_model/";
+  const MODEL_BASE_URL = "assets/my_model/";
+  const DETECTION_THRESHOLD = 0.8;
 
-let model, webcam, labelContainer, maxPredictions;
+  let model = null;
+  let maxPredictions = 0;
+  let webcam = null;
+  let animationFrameId = null;
+  let cameraActive = false;
 
-// Load the image model and setup the webcam
-async function init(containerId, _deviceId) {
-    const modelURL = URL + "model.json";
-    const metadataURL = URL + "metadata.json";
-    const container = document.getElementById(containerId)
-    // load the model and metadata
-    // Refer to tmImage.loadFromFiles() in the API to support files from a file picker
-    // or files from your local hard drive
-    // Note: the pose library adds "tmImage" object to your window (window.tmImage)
+  function updateStatus(message) {
+    const status = document.getElementById("prediction-status");
+    if (status) {
+      status.textContent = message;
+    }
+  }
+
+  async function ensureModelLoaded() {
+    if (model) {
+      return;
+    }
+    updateStatus("Loading model...");
+    const modelURL = MODEL_BASE_URL + "model.json";
+    const metadataURL = MODEL_BASE_URL + "metadata.json";
     model = await tmImage.load(modelURL, metadataURL);
     maxPredictions = model.getTotalClasses();
+    updateStatus("Model ready. Press A to scan.");
+  }
 
-    // Convenience function to setup a webcam
-    const flip = false; // whether to flip the webcam
-    webcam = new tmImage.Webcam(container.offsetWidth, container.offsetHeight - 10, flip); // width, height, flip
-    await webcam.setup({deviceId:{exact: _deviceId}}); // request access to the webcam
+  async function init(containerId, deviceId) {
+    await stopCameraFeed();
+    await ensureModelLoaded();
+
+    const container = document.getElementById(containerId);
+    if (!container) {
+      return;
+    }
+
+    const width = Math.max(container.offsetWidth, 320);
+    const height = Math.max(container.offsetHeight - 10, 240);
+    webcam = new tmImage.Webcam(width, height, false);
+
+    const setupOptions = deviceId
+      ? { deviceId: { exact: deviceId } }
+      : { facingMode: { ideal: "environment" } };
+
+    await webcam.setup(setupOptions);
     await webcam.play();
-    window.requestAnimationFrame(loop);
 
-    // append elements to the DOM
     webcam.canvas.id = "camera";
+    webcam.canvas.setAttribute("role", "img");
+    webcam.canvas.setAttribute(
+      "aria-label",
+      "Live camera feed for Pokemon recognition",
+    );
     container.appendChild(webcam.canvas);
-    //container.removeChild(container.childNodes[0]);
-}
 
-async function loop() {
-    webcam.update(); // update the webcam frame
-    if (Alpine.store('camera').makePrediction) {
-        await predict();
+    cameraActive = true;
+    updateStatus("Camera ready. Press A to identify Pokemon.");
+    animationFrameId = window.requestAnimationFrame(loop);
+  }
+
+  async function loop() {
+    if (!cameraActive || !webcam) {
+      return;
     }
-    window.requestAnimationFrame(loop);
-}
 
-// run the webcam image through the image model
-async function predict() {
-    // predict can take in an image, video or canvas html element
+    webcam.update();
+    if (window.Alpine && Alpine.store("camera").makePrediction) {
+      await predict();
+    }
+    animationFrameId = window.requestAnimationFrame(loop);
+  }
+
+  async function predict() {
+    if (!model || !webcam) {
+      return;
+    }
+
+    updateStatus("Scanning...");
     const prediction = await model.predict(webcam.canvas);
-    for (let i = 0; i < maxPredictions; i++) {
-        const classPrediction =
-            prediction[i].className + ": " + prediction[i].probability.toFixed(2);
-        if (prediction[i].probability > 0.8) {
-            console.log(classPrediction); 
-            speak( prediction[i].className)
-            Alpine.store('camera').makePrediction = false;
-        }
+
+    let bestMatch = null;
+    for (let i = 0; i < maxPredictions; i += 1) {
+      if (!bestMatch || prediction[i].probability > bestMatch.probability) {
+        bestMatch = prediction[i];
+      }
     }
-}
+
+    if (bestMatch && bestMatch.probability >= DETECTION_THRESHOLD) {
+      const confidence = (bestMatch.probability * 100).toFixed(0);
+      speak(bestMatch.className);
+      updateStatus(`Detected ${bestMatch.className} (${confidence}%)`);
+      Alpine.store("camera").makePrediction = false;
+    } else {
+      updateStatus("No confident match yet. Press A to try again.");
+      Alpine.store("camera").makePrediction = false;
+    }
+  }
+
+  async function stopCameraFeed() {
+    cameraActive = false;
+
+    if (animationFrameId !== null) {
+      window.cancelAnimationFrame(animationFrameId);
+      animationFrameId = null;
+    }
+
+    if (webcam) {
+      webcam.stop();
+      if (webcam.canvas && webcam.canvas.parentNode) {
+        webcam.canvas.parentNode.removeChild(webcam.canvas);
+      }
+      webcam = null;
+    }
+
+    updateStatus("Camera stopped.");
+  }
+
+  function isCameraRunning() {
+    return cameraActive;
+  }
+
+  window.init = init;
+  window.stopCameraFeed = stopCameraFeed;
+  window.isCameraRunning = isCameraRunning;
+})();

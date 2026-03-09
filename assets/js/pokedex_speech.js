@@ -1,17 +1,25 @@
-// Initialize new SpeechSynthesisUtterance object
-let speech = new SpeechSynthesisUtterance();
+(function () {
+  "use strict";
 
-// Set Speech Language
-speech.lang = "en";
+  const speech = new SpeechSynthesisUtterance();
+  speech.lang = "en";
 
-// Setup voice
-speech.voice = window.speechSynthesis.getVoices()[0]
+  function assignVoice() {
+    const voices = window.speechSynthesis.getVoices();
+    if (voices.length > 0) {
+      speech.voice = voices[0];
+    }
+  }
 
-function speak(text) {
+  assignVoice();
+  window.speechSynthesis.onvoiceschanged = assignVoice;
+
+  window.speak = function speak(text) {
     speech.text = text;
     speech.rate = 1;
     speech.pitch = 1;
     speech.volume = 1;
+    window.speechSynthesis.cancel();
     window.speechSynthesis.speak(speech);
-}
-
+  };
+})();

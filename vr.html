@@ -1,17 +1,18 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
     <title>PokeAR</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="PokeAR">
-    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
-    <script src="//unpkg.com/alpinejs" type="module" ></script>
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' https://aframe.io https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; media-src 'self' blob:; connect-src 'self' https://cdn.jsdelivr.net; object-src 'none'; base-uri 'self'; frame-ancestors 'self'">
+    <script defer src="https://aframe.io/releases/1.2.0/aframe.min.js" integrity="sha384-3Fq7uOoYlwjBPd7WqW1GJn4kvwaGwSc39zj9mh8g+IjvTColu1PLW5L/smZ0qw/p" crossorigin="anonymous"></script>
+    <script defer src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js" integrity="sha384-AMAkmfJLJ2fA6t+8ZM8TC1qkoAgQwr6etwu9PQelBm+tAY5oC4AN7j05FpKGs3f+" crossorigin="anonymous"></script>
+    <script defer src="./assets/js/vr.js"></script>
 </head>
 <body>
-    <a-scene 
-        inspector="https://cdn.jsdelivr.net/gh/aframevr/aframe-inspector@master/dist/aframe-inspector.min.js"
-        background="color: black">
+    <a-scene background="color: black">
         <a-assets>
             <a-asset-item id="charmander" src="assets/models/charmander/scene.gltf"></a-asset-item>
             <a-asset-item id="bulbasaur" src="assets/models/bulbasaur/scene.gltf"></a-asset-item>
@@ -19,8 +20,7 @@
             <a-asset-item id="pikachu" src="assets/models/pikachu/scene.gltf"></a-asset-item>
             <img id="background" src="assets/img/background.png" >
         </a-assets>
-        <a-entity x-data="{pokemon: new URLSearchParams(location.search).get('pokemon')}"
-          :gltf-model="'#' + pokemon"  position="0 0 -4" animation-mixer></a-entity>
+        <a-entity id="pokemon-model" gltf-model="#bulbasaur" position="0 0 -4" animation-mixer></a-entity>
 
     </a-scene>
 </body>
