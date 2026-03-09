@@ -103,7 +103,6 @@ div.black_screen {
   height: 130px;
   position: relative;
   top: 0px;
-  z-index: 50;
   display: grid;
   grid-gap: 0px 10px;
   padding-top: 5px;
@@ -142,6 +141,7 @@ div.black_screen {
   min-width: 44px;
   min-height: 44px;
   cursor: pointer;
+  z-index: 50;
   background: transparent;
   border: 0;
   touch-action: manipulation;
